@@ -48,24 +48,24 @@ document.addEventListener("submit", function (e) {
       });
       if (msg) {
         msg.className = "modal-msg ok";
-        msg.textContent = "Thanks! I’ll be in touch when there’s something new.";
+        msg.textContent = "¡Gracias! Te avisaré cuando haya novedades.";
       }
     } else {
       if (btn) { btn.disabled = false; }
       if (msg) {
         msg.className = "modal-msg err";
         msg.textContent = data.error === "invalid_email"
-          ? "That email doesn’t look right — please check it."
+          ? "Ese correo no parece correcto — revísalo, por favor."
           : data.error === "rate_limited"
-          ? "Too many tries — wait a minute and try again."
-          : "Something went wrong — please try again.";
+          ? "Demasiados intentos — espera un minuto y vuelve a intentarlo."
+          : "Algo ha ido mal — inténtalo de nuevo.";
       }
     }
   }).catch(function () {
     if (btn) { btn.disabled = false; }
     if (msg) {
       msg.className = "modal-msg err";
-      msg.textContent = "Network error — please try again.";
+      msg.textContent = "Error de red — inténtalo de nuevo.";
     }
   });
 });

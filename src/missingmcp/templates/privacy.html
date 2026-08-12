@@ -1,30 +1,30 @@
   <div class="page-hero">
     <div class="wrap">
-      <h1>Privacy</h1>
-      <p>MissingMCP stores the minimum needed to connect your accounts to Claude &mdash; and none of your actual data.</p>
+      <h1>Privacidad</h1>
+      <p>MissingMCP almacena lo m&iacute;nimo necesario para conectar tus cuentas a Claude &mdash; y ninguno de tus datos reales.</p>
     </div>
   </div>
 
   <section id="who">
     <div class="wrap">
-      <h2 class="sec-h">Who runs this</h2>
+      <h2 class="sec-h">Qui&eacute;n gestiona esto</h2>
       <div class="prose">
-        <p>This instance is operated by <strong>{OPERATOR}{OPERATOR_EMAIL}</strong>. MissingMCP is fully open source &mdash; the entire gateway is on <a href="https://github.com/VelkyVenik/missingmcp">GitHub</a>, so you can audit exactly what it does, or self-host your own instance instead of trusting this one.</p>
+        <p>Esta instancia la gestiona <strong>{OPERATOR}{OPERATOR_EMAIL}</strong>. MissingMCP es totalmente de c&oacute;digo abierto &mdash; el gateway completo est&aacute; en <a href="https://github.com/VelkyVenik/missingmcp">GitHub</a>, as&iacute; que puedes auditar exactamente qu&eacute; hace, o alojar tu propia instancia en lugar de confiar en esta.</p>
       </div>
     </div>
   </section>
 
   <section id="stored">
     <div class="wrap">
-      <h2 class="sec-h">What we store</h2>
-      <p class="lede">Per connected account, and nothing more:</p>
+      <h2 class="sec-h">Qu&eacute; almacenamos</h2>
+      <p class="lede">Por cada cuenta conectada, y nada m&aacute;s:</p>
       <div class="prose">
         <ul>
-          <li>Your sign-in identifier for the connected service (the account email).</li>
-          <li>Encrypted credentials for the connected service &mdash; <strong>AES-256-GCM</strong> at rest. For WHOOP: read-only OAuth tokens issued by WHOOP (your WHOOP password is never entered here). For Garmin: session tokens (your password is used once to sign in and never stored).</li>
-          <li>SHA-256 hashes of the gateway&rsquo;s own access tokens &mdash; never the tokens themselves.</li>
-          <li>Per-account tool-usage counters: tool name, call count, and last-used timestamp &mdash; never tool arguments or results.</li>
-          <li>If you opt in on the home page: your <strong>email address</strong> (so we can tell you when a new connector launches) and any connector suggestion you send. Only if you choose to &mdash; and never used for anything else.</li>
+          <li>Tu identificador de inicio de sesi&oacute;n del servicio conectado (el correo de la cuenta).</li>
+          <li>Credenciales cifradas del servicio conectado &mdash; <strong>AES-256-GCM</strong> en reposo. Para WHOOP: tokens OAuth de solo lectura emitidos por WHOOP (tu contrase&ntilde;a de WHOOP nunca se introduce aqu&iacute;). Para Garmin: tokens de sesi&oacute;n (tu contrase&ntilde;a se usa una sola vez para iniciar sesi&oacute;n y nunca se almacena).</li>
+          <li>Hashes SHA-256 de los propios tokens de acceso del gateway &mdash; nunca los tokens en s&iacute;.</li>
+          <li>Contadores de uso de herramientas por cuenta: nombre de la herramienta, n&uacute;mero de llamadas y fecha de &uacute;ltimo uso &mdash; nunca los argumentos ni los resultados de las herramientas.</li>
+          <li>Si te suscribes en la p&aacute;gina de inicio: tu <strong>direcci&oacute;n de correo</strong> (para avisarte cuando se lance un nuevo conector) y cualquier sugerencia de conector que env&iacute;es. Solo si t&uacute; eliges hacerlo &mdash; y nunca se usa para nada m&aacute;s.</li>
         </ul>
       </div>
     </div>
@@ -32,37 +32,37 @@
 
   <section id="never-stored">
     <div class="wrap">
-      <h2 class="sec-h">What we never store</h2>
+      <h2 class="sec-h">Qu&eacute; nunca almacenamos</h2>
       <div class="prose">
-        <p>Your health, fitness or activity data. It passes through on demand between the connected service and your Claude client and is not written to disk. No ads, no third-party trackers, no cookies.</p>
+        <p>Tus datos de salud, forma f&iacute;sica o actividad. Se transmiten bajo demanda entre el servicio conectado y tu cliente de Claude y no se escriben en disco. Sin anuncios, sin rastreadores de terceros, sin cookies.</p>
       </div>
     </div>
   </section>
 
   <section id="sharing">
     <div class="wrap">
-      <h2 class="sec-h">Sharing &amp; logs</h2>
+      <h2 class="sec-h">Compartici&oacute;n y registros</h2>
       <div class="prose">
-        <p>Data flows only between your Claude client and the connected service, and only when you ask Claude a question &mdash; connecting an account is your explicit consent for that flow. Nothing is sold or shared with any other party. Operational logs (hosted on Railway) record account email, tool names, and timings for monitoring &mdash; never token values, never your data.</p>
+        <p>Los datos solo fluyen entre tu cliente de Claude y el servicio conectado, y solo cuando le haces una pregunta a Claude &mdash; conectar una cuenta es tu consentimiento expl&iacute;cito para ese flujo. Nada se vende ni se comparte con terceros. Los registros operativos (alojados en Railway) guardan el correo de la cuenta, los nombres de herramientas y los tiempos con fines de monitorizaci&oacute;n &mdash; nunca valores de tokens, nunca tus datos.</p>
       </div>
     </div>
   </section>
 
   <section id="revoke">
     <div class="wrap">
-      <h2 class="sec-h">Revoke &amp; delete</h2>
+      <h2 class="sec-h">Revocar y eliminar</h2>
       <div class="cards">
         <div class="card">
-          <h3>Disconnect in Claude</h3>
-          <p>Settings &rarr; Connectors &rarr; remove the connector.</p>
+          <h3>Desconectar en Claude</h3>
+          <p>Configuraci&oacute;n &rarr; Conectores &rarr; elimina el conector.</p>
         </div>
         <div class="card">
-          <h3>Revoke at the source</h3>
-          <p>WHOOP: app settings &rarr; connected apps &mdash; the gateway detects the revocation and automatically deletes your stored tokens. Garmin: change your password or manage sessions.</p>
+          <h3>Revocar en el origen</h3>
+          <p>WHOOP: configuraci&oacute;n de la app &rarr; apps conectadas &mdash; el gateway detecta la revocaci&oacute;n y elimina autom&aacute;ticamente tus tokens almacenados. Garmin: cambia tu contrase&ntilde;a o gestiona las sesiones.</p>
         </div>
         <div class="card">
-          <h3>Delete everything</h3>
-          <p>Email the operator{OPERATOR_EMAIL} to have every stored record &mdash; including any newsletter signup &mdash; deleted.</p>
+          <h3>Eliminarlo todo</h3>
+          <p>Escribe al operador{OPERATOR_EMAIL} para que se elimine cualquier registro almacenado &mdash; incluida cualquier suscripci&oacute;n al aviso de nuevos conectores.</p>
         </div>
       </div>
     </div>
@@ -71,7 +71,7 @@
   <section id="note">
     <div class="wrap">
       <div class="note">
-        This page may be updated as connectors are added. The source of truth is always the <a href="https://github.com/VelkyVenik/missingmcp">open-source repo</a>.
+        Esta p&aacute;gina puede actualizarse conforme se a&ntilde;adan conectores. La fuente de verdad siempre es el <a href="https://github.com/VelkyVenik/missingmcp">repositorio de c&oacute;digo abierto</a>.
       </div>
     </div>
   </section>

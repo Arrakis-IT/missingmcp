@@ -59,14 +59,14 @@ def test_home_page(tmp_path):
     c = _client(tmp_path)
     r = c.get("/")
     assert r.status_code == 200
-    assert "Your data," in r.text                 # hero H1
+    assert "Tus datos," in r.text                 # hero H1
     assert 'href="/garmin"' in r.text             # Garmin card links to the subpage
     # Rohlík graduated: official MCP exists, so the card moved to the
     # "No longer missing" section and points at Rohlík directly, not /rohlik.
     assert 'href="/rohlik"' not in r.text
-    assert "No longer missing" in r.text
+    assert "Ya no faltan" in r.text
     assert "https://mcp.rohlik.cz/mcp" in r.text
-    assert "never stored" in r.text               # security section
+    assert "nunca almacenadas" in r.text          # security section
     assert r.headers["x-frame-options"] == "DENY"
 
 
@@ -74,7 +74,7 @@ def test_unknown_path_serves_home_as_404(tmp_path):
     c = _client(tmp_path)
     r = c.get("/definitely-not-a-page")
     assert r.status_code == 404
-    assert "Your data," in r.text
+    assert "Tus datos," in r.text
 
 
 def test_healthz(tmp_path):
@@ -126,7 +126,7 @@ def test_garmin_page(tmp_path):
     c = _client(tmp_path)
     r = c.get("/garmin")
     assert r.status_code == 200
-    assert "How to connect" in r.text
+    assert "Cómo conectar" in r.text
     assert "https://gw.example.com/garmin/mcp" in r.text
     # connector-template sections: tips (skills/prompts land there later) and
     # the generated all-tools listing
@@ -135,7 +135,7 @@ def test_garmin_page(tmp_path):
     assert "get_sleep_data" in r.text                 # a stable generated tool entry
     # credit where due: built on the unmodified OS garmin_mcp, we only operate it
     assert "https://github.com/Taxuspt/garmin_mcp" in r.text
-    assert "unmodified" in r.text
+    assert "sin modificar" in r.text
 
 
 def test_static_logo_assets_served(tmp_path):
@@ -189,7 +189,7 @@ def test_support_link_sits_at_the_connect_moment(tmp_path):
     # home: inside "How it works" (i.e. before the security section)
     home = _client(tmp_path).get("/").text
     assert home.index("buymeacoffee.com") < home.index('id="security"')
-    assert "Everything here is free" in home
+    assert "Todo esto es gratis" in home
 
 
 def test_mcp_server_cards(tmp_path):
@@ -266,7 +266,7 @@ def test_og_desc_falls_back_to_first_sentence():
 def test_home_features_garmin_first(tmp_path):
     r = _client(tmp_path).get("/").text
     assert 'class="card featured"' in r
-    assert "Your watch has the answers." in r              # featured tagline
+    assert "Tu reloj tiene las respuestas." in r            # featured tagline
     # (the "Soon" roadmap card for Whoop graduated to the live WHOOP card —
     # covered by test_home_shows_whoop_card)
 
@@ -280,24 +280,24 @@ def test_operator_link_comes_from_config(tmp_path):
     assert '<a href="https://jane.example">Jane Doe</a>' in r
 
     plain = _client(tmp_path).get("/").text        # no OPERATOR_URL configured
-    assert "the operator" in plain                 # default name, unlinked
+    assert "el operador" in plain                  # default name, unlinked
     assert "{OPERATOR}" not in plain
 
 
 def test_subpages_share_site_chrome(tmp_path):
-    # one _layout.html wraps every page: same header (logo linking home, nav)
+    # one _layout.html wraps every page: same header (logo linking home, no nav)
     # and footer on the home page and the connector landing alike
     c = _client(tmp_path)
     for path in ("/", "/garmin", "/privacy"):
         r = c.get(path).text
         assert 'class="logo" href="/"' in r, path
         assert 'src="/static/icon.png"' in r, path
-        assert 'href="/#security"' in r, path         # shared nav
-        assert "Your data, in Claude." in r, path               # shared footer (umbrella promise)
-        # author credit is fixed (who built MissingMCP); the operator — who runs
-        # this instance — stays config-driven and appears separately
-        assert 'Built by <a href="https://slajs.eu">Vaclav Slajs</a>' in r, path
-        assert "This instance is run by" in r, path
+        assert "<nav>" not in r, path                  # nav bar removed site-wide
+        # shared footer: brand line + fixed "run by Arrakis IT" line (this
+        # instance hardcodes its operator in the footer, not {OPERATOR})
+        assert "MissingMCP (para cuñaos)" in r, path
+        assert 'Proyecto original de <a href="https://slajs.eu">Vaclav Slajs</a>' in r, path
+        assert "Esta instancia la gestiona Arrakis IT." in r, path
 
 
 def _whoop_client():
@@ -328,8 +328,8 @@ def test_whoop_is_beta_with_limit_note():
     g = _whoop_client().get("/whoop").text   # /whoop only exists when WHOOP creds are set
     assert "pill beta" in g            # hero pill is Beta, not Live
     assert "pill live" not in g        # no longer advertised as Live
-    assert "approval" in g.lower()     # explains it's pending WHOOP approval
-    assert "10 users" in g             # the current user cap
+    assert "aprobación" in g.lower()   # explains it's pending WHOOP approval
+    assert "10 usuarios" in g          # the current user cap
 
 
 def test_home_lists_upcoming_connectors(tmp_path):
@@ -347,8 +347,8 @@ def test_hero_leads_with_outcome(tmp_path):
     # no badge — the H1 leads (avoid over-niching the umbrella)
     assert 'class="badge"' not in home
     # subhead leads with the outcome, not "connectors" / "MCP server"
-    assert "except the numbers your apps keep locked away" in home
-    assert "an answer that actually knows" in home
+    assert "los números que tus apps guardan bajo llave" in home
+    assert "una respuesta que de verdad lo sabe" in home
     # <title> leads with the promise AND keeps the SEO keyword tail
     assert "Your data, in Claude" in home          # from <title>/og:title
     assert "Garmin MCP Server" in home             # SEO keyword retained
@@ -358,13 +358,13 @@ def test_hero_leads_with_outcome(tmp_path):
 
 def test_just_ask_section(tmp_path):
     home = _client(tmp_path).get("/").text
-    assert "Just ask" in home                                   # section heading
-    assert "Am I on track for today" in home                    # the "You" bubble
-    assert "running a deficit for the load ahead" in home        # the "Claude" bubble
-    assert "No single app does that." in home                    # the caption
-    assert "How did I sleep this week?" in home                  # first (easy) chip
-    assert "Compare my last three long runs." in home
-    assert "Why was my recovery low today?" in home
+    assert "Simplemente pregunta" in home                        # section heading
+    assert "Voy bien para la tirada larga de hoy" in home        # the "You" bubble
+    assert "vas con déficit para la carga que te espera" in home  # the "Claude" bubble
+    assert "Ninguna app por separado hace eso." in home           # the caption
+    assert "¿Cómo he dormido esta semana?" in home                # first (easy) chip
+    assert "Compara mis últimas tres tiradas largas." in home
+    assert "¿Por qué hoy mi recuperación ha sido baja?" in home
     # the demo sits above the connector list
     assert home.index('id="just-ask"') < home.index('id="connectors"')
 
@@ -372,12 +372,12 @@ def test_just_ask_section(tmp_path):
 def test_garmin_page_leads_with_outcome(tmp_path):
     g = _client(tmp_path).get("/garmin").text
     # page-hero subhead now opens on the outcome, not "A hosted Garmin MCP server:"
-    assert "everything your watch knows" in g.lower()
+    assert "todo lo que sabe tu reloj" in g.lower()
     # the old jargon-first opener is gone
     assert "A hosted <strong>Garmin MCP server</strong>: everything" not in g
     # MCP is kept, but demoted to an under-the-hood aside
-    assert "under the hood" in g.lower()
-    assert "hosted MCP server" in g
+    assert "por debajo" in g.lower()
+    assert "servidor mcp alojado" in g.lower()
 
 
 def test_privacy_page(tmp_path):
@@ -385,8 +385,8 @@ def test_privacy_page(tmp_path):
     r = c.get("/privacy")
     assert r.status_code == 200
     assert "AES-256-GCM" in r.text
-    assert "never stored" in r.text or "never store" in r.text
-    assert "the operator" in r.text          # OPERATOR_NAME default filled by _render
+    assert "nunca se almacena" in r.text or "nunca se almacenan" in r.text
+    assert "el operador" in r.text           # OPERATOR_NAME default filled by _render
 
 
 def test_footer_links_privacy(tmp_path):
@@ -414,14 +414,14 @@ def test_connector_pages_have_copy_buttons(tmp_path):
 def test_whoop_page_carries_brand_attribution_and_disclaimer():
     # WHOOP app-approval: data attributed to WHOOP + no implied affiliation.
     r = _whoop_client().get("/whoop").text
-    assert "data by WHOOP" in r
-    assert "registered trademark of WHOOP, Inc." in r
-    assert "not affiliated with, endorsed by, or sponsored by WHOOP" in r
+    assert "datos de WHOOP" in r
+    assert "marca registrada de WHOOP, Inc." in r
+    assert "no está afiliado, respaldado ni patrocinado por WHOOP" in r
 
 
 def test_privacy_mentions_auto_delete_on_revocation(tmp_path):
     r = _client(tmp_path).get("/privacy").text
-    assert "automatically deletes your stored tokens" in r
+    assert "elimina automáticamente tus tokens almacenados" in r
 
 
 import sqlite3
@@ -554,5 +554,5 @@ def test_suggest_description_is_required(tmp_path):
 
 def test_privacy_mentions_signup_storage_and_deletion(tmp_path):
     r = _client(tmp_path).get("/privacy").text
-    assert "newsletter" in r.lower() or "notify" in r.lower()   # opt-in disclosed
-    assert "email the operator" in r.lower()                    # deletion path
+    assert "suscripción" in r.lower() or "avisarte" in r.lower()   # opt-in disclosed
+    assert "escribe al operador" in r.lower()                      # deletion path

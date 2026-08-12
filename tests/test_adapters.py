@@ -91,7 +91,7 @@ def test_start_login_blocked_maps_message_and_reason():
         with pytest.raises(base.LoginError) as ei:
             _adapter().start_login({"garmin_email": "me@x.cz", "garmin_password": "pw"})
     assert ei.value.reason == "blocked"
-    assert "rate-limiting" in str(ei.value) and "not your password" in str(ei.value)
+    assert "limitando temporalmente" in str(ei.value) and "no de tu contraseña" in str(ei.value)
 
 
 def test_start_login_auth_error_maps_message():
@@ -99,7 +99,7 @@ def test_start_login_auth_error_maps_message():
                       side_effect=login.GarminLoginError("bad", reason="auth")):
         with pytest.raises(base.LoginError) as ei:
             _adapter().start_login({"garmin_email": "me@x.cz", "garmin_password": "pw"})
-    assert ei.value.reason == "auth" and "check your Garmin email" in str(ei.value)
+    assert ei.value.reason == "auth" and "revisa tu correo y contraseña de Garmin" in str(ei.value)
 
 
 def test_resume_ok_returns_login_ok():
@@ -114,7 +114,7 @@ def test_resume_failure_is_retryable_with_same_state():
         with pytest.raises(base.SecondFactorError) as ei:
             _adapter().resume_second_factor(state, {"mfa_code": "000000"})
     assert ei.value.state is state
-    assert "Incorrect or expired code" in str(ei.value)
+    assert "Código incorrecto o caducado" in str(ei.value)
 
 
 def test_verify_ok_and_failure():
@@ -123,7 +123,7 @@ def test_verify_ok_and_failure():
     with patch.object(login, "verify_tokens", side_effect=login.GarminLoginError("bad")):
         with pytest.raises(base.LoginError) as ei:
             _adapter().verify('{"t":1}')
-    assert "could not be verified" in str(ei.value)
+    assert "No se pudo verificar" in str(ei.value)
 
 
 from missingmcp.adapters import build_adapters

@@ -194,17 +194,17 @@ async def authorize_get(request, adapter, state, conn, config) -> HTMLResponse |
             log_error("authorize-client-id-not-dcr",
                       client_id=params["client_id"][:8])
             return HTMLResponse(
-                "<h1>Leave the OAuth fields empty</h1>"
-                "<p>Your client sent an <strong>OAuth Client ID</strong> that "
-                "this server never issued, so there is nothing to sign in "
-                "with. That happens when the connector was added with the "
-                "optional <em>OAuth Client ID</em> / <em>OAuth Client Secret</em> "
-                "fields filled in &mdash; they are not your account details, and "
-                "this server hands them out automatically.</p>"
-                "<p>To fix it: <strong>remove the connector</strong>, add it "
-                "again with <strong>only the URL</strong>, and leave both OAuth "
-                "fields blank. You sign in with your account on the next "
-                "screen.</p>",
+                "<h1>Deja los campos OAuth vacíos</h1>"
+                "<p>Tu cliente ha enviado un <strong>OAuth Client ID</strong> que "
+                "este servidor nunca emitió, así que no hay nada con lo que iniciar "
+                "sesión. Esto ocurre cuando el conector se añadió con los campos "
+                "opcionales <em>OAuth Client ID</em> / <em>OAuth Client Secret</em> "
+                "rellenados &mdash; no son los datos de tu cuenta, y este servidor "
+                "los entrega automáticamente.</p>"
+                "<p>Para arreglarlo: <strong>elimina el conector</strong>, añádelo "
+                "de nuevo con <strong>solo la URL</strong>, y deja ambos campos "
+                "OAuth en blanco. Inicias sesión con tu cuenta en la siguiente "
+                "pantalla.</p>",
                 status_code=400)
         # Claude/ChatGPT cache their DCR registration per org — when it's gone
         # (orphan sweep, DB reset), every retry dead-ends here until the user
@@ -212,19 +212,19 @@ async def authorize_get(request, adapter, state, conn, config) -> HTMLResponse |
         # these GET 400s were previously invisible in the logs.
         log_error("authorize-unknown-client", client_id=params["client_id"][:8])
         return HTMLResponse(
-            "<h1>Connector registration expired</h1>"
-            "<p>Your AI client is using a registration this server no longer "
-            "knows. To fix it: <strong>remove the connector</strong> in your "
-            "client (Claude: Settings &rarr; Connectors &rarr; Remove), then "
-            "<strong>add it again</strong> and sign in. Add it with "
-            "<strong>only the URL</strong> &mdash; if you fill in the optional "
-            "<em>OAuth Client ID</em> / <em>Client Secret</em> fields, you will "
-            "land back here.</p>",
+            "<h1>El registro del conector ha caducado</h1>"
+            "<p>Tu cliente de IA está usando un registro que este servidor ya no "
+            "conoce. Para arreglarlo: <strong>elimina el conector</strong> en tu "
+            "cliente (Claude: Configuración &rarr; Conectores &rarr; Eliminar), "
+            "luego <strong>añádelo de nuevo</strong> e inicia sesión. Añádelo con "
+            "<strong>solo la URL</strong> &mdash; si rellenas los campos opcionales "
+            "<em>OAuth Client ID</em> / <em>Client Secret</em>, volverás a caer "
+            "aquí.</p>",
             status_code=400)
     if not security.validate_redirect_uri(params["redirect_uri"], client["redirect_uris"]):
-        return HTMLResponse("invalid redirect_uri", status_code=400)
+        return HTMLResponse("redirect_uri no válido", status_code=400)
     if params["code_challenge_method"] != "S256" or not params["code_challenge"]:
-        return HTMLResponse("PKCE S256 required", status_code=400)
+        return HTMLResponse("Se requiere PKCE S256", status_code=400)
     if is_upstream_oauth(adapter):
         # No form of ours: stash Claude's OAuth params (same one-time TTL stash
         # as MFA, pending=None) and send the user to the provider. The stash id
@@ -275,8 +275,9 @@ async def _bounded(config, fn, *args):
 
 
 def _timeout_message(adapter) -> str:
-    return (f"{adapter.display_name} sign-in timed out — the service may be "
-            "rate-limiting new sign-ins. Please wait a moment and try again.")
+    return (f"El inicio de sesión con {adapter.display_name} ha tardado demasiado — el "
+            "servicio podría estar limitando nuevos inicios de sesión. Espera un momento "
+            "e inténtalo de nuevo.")
 
 
 async def authorize_post(request, adapter, state, conn, config) -> HTMLResponse | RedirectResponse:
@@ -292,18 +293,18 @@ async def authorize_post(request, adapter, state, conn, config) -> HTMLResponse 
         # OAuth params round-trip through the form; values are html-escaped).
         return render_authorize(_oauth_params_from(form), state.csrf.issue(),
                                 config, adapter,
-                                error="Your session expired. Please sign in again.")
+                                error="Tu sesión ha caducado. Vuelve a iniciar sesión.")
 
     # second-factor step (Garmin: MFA)
     if has_login_id:
         popped = state.pop_mfa(form["login_id"], adapter.name)
         if popped is None:
             log_error("mfa-session-missing", login_id=form.get("login_id", "")[:6])
-            return HTMLResponse("MFA session expired, please start over", status_code=400)
+            return HTMLResponse("La sesión MFA ha caducado, empieza de nuevo", status_code=400)
         pending, params = popped
         client = store.get_client(conn, params["client_id"])
         if client is None or not security.validate_redirect_uri(params["redirect_uri"], client["redirect_uris"]):
-            return HTMLResponse("invalid client/redirect_uri", status_code=400)
+            return HTMLResponse("cliente o redirect_uri no válidos", status_code=400)
         try:
             log("mfa-resume-start", mfa_len=len(form.get("mfa_code", "")))
             t0 = time.monotonic()
@@ -353,7 +354,7 @@ async def authorize_post(request, adapter, state, conn, config) -> HTMLResponse 
     params = _oauth_params_from(form)
     client = store.get_client(conn, params["client_id"])
     if client is None or not security.validate_redirect_uri(params["redirect_uri"], client["redirect_uris"]):
-        return HTMLResponse("invalid client/redirect_uri", status_code=400)
+        return HTMLResponse("cliente o redirect_uri no válidos", status_code=400)
     try:
         log("login-start", email=adapter.login_hint(form))
         t0 = time.monotonic()
@@ -375,7 +376,7 @@ async def authorize_post(request, adapter, state, conn, config) -> HTMLResponse 
         log_exc("login-start-failed", e, reason="unknown", error_type=type(e).__name__, error=str(e))
         _login_failed(adapter, "unknown")
         return render_authorize(params, state.csrf.issue(), config, adapter,
-                                f"{adapter.display_name} sign-in failed, please try again.")
+                                f"El inicio de sesión con {adapter.display_name} ha fallado, inténtalo de nuevo.")
     if isinstance(result, SecondFactorNeeded):
         telemetry.capture("mfa_challenged", properties={"adapter": adapter.name})
         lid = state.put_mfa(result.state, params, adapter.name)
@@ -459,19 +460,19 @@ async def authorize_callback(request, adapter, state, conn, config) -> HTMLRespo
     if popped is None:
         log_warn("upstream-oauth-callback", adapter=adapter.name, status="expired")
         return _upstream_error(config, adapter,
-                               "This sign-in link expired — go back to Claude and try connecting again.")
+                               "Este enlace de inicio de sesión ha caducado — vuelve a Claude e inténtalo de nuevo.")
     _pending, params = popped
     client = store.get_client(conn, params["client_id"])
     if client is None or not security.validate_redirect_uri(params["redirect_uri"],
                                                             client["redirect_uris"]):
-        return HTMLResponse("invalid client/redirect_uri", status_code=400)
+        return HTMLResponse("cliente o redirect_uri no válidos", status_code=400)
     if q.get("error") or not q.get("code"):
         # the user declined at the provider — expected, not an anomaly
         log_warn("upstream-oauth-callback", adapter=adapter.name, status="denied",
                  reason=q.get("error", "no_code"))
         _login_failed(adapter, "denied")
         return _upstream_error(config, adapter,
-                               f"{adapter.display_name} declined the connection — go back to Claude and try again.")
+                               f"{adapter.display_name} ha rechazado la conexión — vuelve a Claude e inténtalo de nuevo.")
     try:
         result = await adapter.handle_callback(q)
         # verify is a blocking network step (WhoopAdapter.verify does a 15s
@@ -494,7 +495,7 @@ async def authorize_callback(request, adapter, state, conn, config) -> HTMLRespo
                 error_type=type(e).__name__, error=str(e))
         _login_failed(adapter, "unknown")
         return _upstream_error(config, adapter,
-                               f"{adapter.display_name} sign-in failed, please try again.")
+                               f"El inicio de sesión con {adapter.display_name} ha fallado, inténtalo de nuevo.")
     log("upstream-oauth-callback", adapter=adapter.name, status="ok")
     log("authorize-finish", step="upstream")
     telemetry.capture("login_succeeded", distinct_id=result.account_key,

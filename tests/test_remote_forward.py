@@ -78,9 +78,9 @@ def test_upstream_auth_rejection_maps_to_reauth_401(fake_remote, status):
     assert r.status_code == 401                      # not streamed through; re-auth challenge
     assert r.json() == {                             # stable shape, byte-for-byte
         "error": "invalid_token",
-        "message": "Your Acme session expired. Please sign in to Acme again "
-                   "to reconnect — your MCP client will prompt you (in Claude: "
-                   "Settings → Connectors → Acme). Help: https://x/acme",
+        "message": "Tu sesión de Acme ha caducado. Vuelve a iniciar sesión en Acme "
+                   "para reconectar — tu cliente MCP te lo pedirá (en Claude: "
+                   "Configuración → Conectores → Acme). Ayuda: https://x/acme",
     }
     assert 'resource_metadata="https://x/.well-known/oauth-protected-resource/acme/mcp"' \
         in r.headers["www-authenticate"]

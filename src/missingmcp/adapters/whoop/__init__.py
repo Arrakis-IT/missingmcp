@@ -31,10 +31,10 @@ class WhoopAdapter:
             blob = await self.api.exchange_code(query.get("code", ""))
             profile = await self.api.fetch_profile(blob["access_token"])
         except (WhoopAuthError, httpx.HTTPError) as e:
-            raise LoginError("WHOOP sign-in could not be completed — please try again.") from e
+            raise LoginError("No se pudo completar el inicio de sesión con WHOOP — inténtalo de nuevo.") from e
         email = profile.get("email", "")
         if not email:
-            raise LoginError("WHOOP did not return an account email.")
+            raise LoginError("WHOOP no ha devuelto un correo de cuenta.")
         blob["user_id"] = profile.get("user_id")
         blob["email"] = email
         return LoginOk(account_key=normalize_account_key(email), blob=json.dumps(blob))
@@ -60,8 +60,8 @@ class WhoopAdapter:
                           headers={"Authorization": f"Bearer {d['access_token']}"},
                           timeout=HTTP_TIMEOUT_S)
         except httpx.HTTPError as e:
-            raise LoginError("WHOOP could not be reached to verify the sign-in.") from e
+            raise LoginError("No se pudo contactar con WHOOP para verificar el inicio de sesión.") from e
         if r.status_code != 200:
-            raise LoginError("WHOOP sign-in could not be verified.")
+            raise LoginError("No se pudo verificar el inicio de sesión con WHOOP.")
         p = r.json()
         return f"{p.get('first_name', '')} {p.get('last_name', '')}".strip()

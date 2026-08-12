@@ -183,9 +183,9 @@ def test_authorize_get_unknown_client_explains_recovery(conn, capsys):
                    "&redirect_uri=https://claude.ai/cb&code_challenge=abc"
                    "&code_challenge_method=S256&state=x")
     assert r.status_code == 400
-    assert "registration expired" in r.text.lower()
-    assert "remove the connector" in r.text.lower()
-    assert "add it again" in r.text.lower()
+    assert "registro del conector ha caducado" in r.text.lower()
+    assert "elimina el conector" in r.text.lower()
+    assert "añádelo de nuevo" in r.text.lower()
     assert "authorize-unknown-client" in capsys.readouterr().out
 
 
@@ -201,9 +201,9 @@ def test_authorize_get_user_supplied_client_id_says_leave_oauth_fields_empty(con
                    "&code_challenge_method=S256&state=x")
     assert r.status_code == 400
     body = r.text.lower()
-    assert "leave the oauth fields empty" in body
-    assert "only the url" in body
-    assert "registration expired" not in body        # the misleading advice is gone
+    assert "deja los campos oauth vacíos" in body
+    assert "solo la url" in body
+    assert "registro del conector ha caducado" not in body   # the misleading advice is gone
     out = capsys.readouterr().out
     assert "authorize-client-id-not-dcr" in out      # counted apart from stale DCR
     assert "ilya@example.com" not in r.text          # never reflect it into the page
@@ -221,7 +221,7 @@ def test_authorize_post_bad_csrf_rerenders_form(conn):
         "garmin_email": "me@x.cz", "garmin_password": "pw",
     })
     assert r.status_code == 200
-    assert "session expired" in r.text.lower()               # inline error, not a 400 page
+    assert "sesión ha caducado" in r.text.lower()             # inline error, not a 400 page
     assert f'name="client_id" value="{cid}"' in r.text       # OAuth params preserved
     assert 'name="csrf" value="forged"' not in r.text        # fresh token issued
     assert 'name="csrf" value="' in r.text
@@ -302,8 +302,8 @@ def test_login_blocked_shows_retry_message(conn):
             "garmin_email": "me@x.cz", "garmin_password": "pw",
         })
     assert r.status_code == 200
-    assert "rate-limiting" in r.text                         # Garmin-side limit, not "wrong password"
-    assert "not your password" in r.text
+    assert "limitando temporalmente" in r.text                # Garmin-side limit, not "wrong password"
+    assert "no de tu contraseña" in r.text
     assert "garmin_email" in r.text                          # form re-rendered to retry
 
 
@@ -329,7 +329,7 @@ def test_login_timeout_shows_retry_message(conn):
             "garmin_email": "me@x.cz", "garmin_password": "pw",
         })
     assert r.status_code == 200
-    assert "timed out" in r.text.lower()                 # honest timeout message
+    assert "ha tardado demasiado" in r.text.lower()                 # honest timeout message
     assert "garmin_email" in r.text                      # form re-rendered to retry
     assert store.get_account_tokens(conn, "garmin", "me@x.cz", CONFIG.gateway_secret) is None
 
@@ -507,7 +507,7 @@ def test_mfa_login_id_from_another_adapter_is_rejected(conn, fake_remote):
     csrf = state.csrf.issue()
     r = client.post("/oauth/authorize", data={"csrf": csrf, "login_id": lid, "mfa_code": "123456"})
     assert r.status_code == 400
-    assert "MFA session expired" in r.text
+    assert "sesión MFA ha caducado" in r.text
 
 
 # --- upstream-OAuth login shape (C) — driven through StubUpstreamOAuthAdapter ---
@@ -583,7 +583,7 @@ def test_upstream_callback_unknown_state_is_400(conn):
     c = _upstream_app(conn, StubUpstreamOAuthAdapter())
     r = c.get("/oauth/callback", params={"code": "x", "state": "bogus"})
     assert r.status_code == 400
-    assert "expired" in r.text
+    assert "ha caducado" in r.text
 
 
 def test_upstream_callback_state_is_single_use(conn):
@@ -629,7 +629,7 @@ def test_upstream_callback_unexpected_exception_is_400_not_500(conn):
     sid = r.headers["location"].split("state=")[1]
     r = c.get("/oauth/callback", params={"code": "x", "state": sid})
     assert r.status_code == 400
-    assert "sign-in failed" in r.text
+    assert "ha fallado" in r.text
     assert store.get_account_tokens(conn, "acmeauth", "me@x.cz", CONFIG.gateway_secret) is None
 
 
@@ -652,7 +652,7 @@ def test_upstream_callback_bounds_slow_verify(conn):
     sid = r.headers["location"].split("state=")[1]
     r = c.get("/oauth/callback", params={"code": "x", "state": sid})
     assert r.status_code == 400
-    assert "timed out" in r.text.lower()                 # honest timeout message
+    assert "ha tardado demasiado" in r.text.lower()                 # honest timeout message
     assert store.get_account_tokens(conn, "acmeauth", "me@x.cz", CONFIG.gateway_secret) is None
 
 

@@ -1,16 +1,16 @@
   <div class="auth">
-    <h1>Enter your <span class="hl">MFA</span> code</h1>
-    <p class="sub">Garmin sent a verification code to your email or phone.</p>
+    <h1>Introduce tu c&oacute;digo <span class="hl">MFA</span></h1>
+    <p class="sub">Garmin ha enviado un c&oacute;digo de verificaci&oacute;n a tu correo o tel&eacute;fono.</p>
     <div class="note">
-      The code is used once to finish signing in to Garmin and is not stored.
-      Only the resulting encrypted session tokens are kept. This gateway is
-      operated by <strong>{OPERATOR}{OPERATOR_EMAIL}</strong>.
+      El c&oacute;digo se usa una sola vez para terminar de iniciar sesi&oacute;n en Garmin y no se
+      almacena. Solo se conservan los tokens de sesi&oacute;n cifrados resultantes. Este gateway
+      lo gestiona <strong>{OPERATOR}{OPERATOR_EMAIL}</strong>.
     </div>
     {ERROR}
     <form method="post" action="{AUTHORIZE_ACTION}">
       <input type="hidden" name="csrf" value="{CSRF}">
       <input type="hidden" name="login_id" value="{LOGIN_ID}">
-      <label>MFA code<input name="mfa_code" inputmode="numeric" autocomplete="one-time-code" required></label>
-      <button class="btn" type="submit">Verify</button>
+      <label>C&oacute;digo MFA<input name="mfa_code" inputmode="numeric" autocomplete="one-time-code" required></label>
+      <button class="btn" type="submit">Verificar</button>
     </form>
   </div>

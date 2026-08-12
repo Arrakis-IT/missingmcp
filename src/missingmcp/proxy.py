@@ -123,10 +123,10 @@ def _reauth_required(config, adapter) -> JSONResponse:
     x = adapter.display_name
     return JSONResponse(
         {"error": "invalid_token",
-         "message": f"Your {x} session expired. Please sign in to {x} again "
-                    f"to reconnect — your MCP client will prompt you (in Claude: "
-                    f"Settings → Connectors → {x}). "
-                    f"Help: {config.public_url}/{adapter.name}"},
+         "message": f"Tu sesión de {x} ha caducado. Vuelve a iniciar sesión en {x} "
+                    f"para reconectar — tu cliente MCP te lo pedirá (en Claude: "
+                    f"Configuración → Conectores → {x}). "
+                    f"Ayuda: {config.public_url}/{adapter.name}"},
         status_code=401,
         headers={"WWW-Authenticate": challenge},
     )

@@ -84,7 +84,7 @@ def load_config(env: Mapping[str, str] | None = None) -> Config:
         # retry, short enough that a rate-limited Garmin can't hang the request for
         # minutes (observed: a 125s authorize POST before the client gave up).
         login_timeout=30,
-        operator_name=env.get("OPERATOR_NAME", "the operator"),
+        operator_name=env.get("OPERATOR_NAME", "el operador"),
         operator_email=env.get("OPERATOR_EMAIL", ""),
         operator_url=env.get("OPERATOR_URL", "").strip(),
         backup_s3_endpoint=env.get("BACKUP_S3_ENDPOINT", "").rstrip("/"),

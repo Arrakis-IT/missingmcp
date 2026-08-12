@@ -50,11 +50,11 @@ def _login_error_message(reason: str) -> str:
         # Garmin (via Cloudflare) rate-limits fresh logins on the mobile SSO
         # endpoint — per-account, not per-IP (garth#217, garminconnect#344) — and
         # the widget/portal fallback can flake. Not the user's fault; a retry usually works.
-        return ("Garmin is temporarily rate-limiting new sign-ins (a limit on "
-                "Garmin's side, not your password). Please wait a couple of minutes and try again.")
+        return ("Garmin está limitando temporalmente los nuevos inicios de sesión (un "
+                "límite del lado de Garmin, no de tu contraseña). Espera un par de minutos e inténtalo de nuevo.")
     if reason == "auth":
-        return "Garmin sign-in failed — check your Garmin email and password."
-    return "Garmin sign-in failed, please try again."
+        return "El inicio de sesión con Garmin ha fallado — revisa tu correo y contraseña de Garmin."
+    return "El inicio de sesión con Garmin ha fallado, inténtalo de nuevo."
 
 
 class GarminAdapter:
@@ -89,11 +89,11 @@ class GarminAdapter:
         try:
             tokens = login.resume_login(pending, form.get("mfa_code", ""))
         except Exception as e:  # noqa: BLE001 - wrong/expired code: caller re-prompts
-            raise SecondFactorError("Incorrect or expired code, try again", state=state) from e
+            raise SecondFactorError("Código incorrecto o caducado, inténtalo de nuevo", state=state) from e
         return LoginOk(account_key=normalize_account_key(email), blob=tokens)
 
     def verify(self, blob: str) -> str:
         try:
             return login.verify_tokens(blob)
         except login.GarminLoginError as e:
-            raise LoginError("Garmin sign-in could not be verified") from e
+            raise LoginError("No se pudo verificar el inicio de sesión con Garmin") from e
